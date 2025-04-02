@@ -19,9 +19,38 @@ class BreadthFirstSearch:
         node = Node("", grid.start, 0)
 
         # Initialize the explored dictionary to be empty
-        explored = {} 
-        
-        # Add the node to the explored dictionary
+        explored = {}
         explored[node.state] = True
+
+        # Aplicar test-objetivo al nodo raíz
+        if node.state == grid.end:
+            return Solution(node, explored)
         
-        return NoSolution(explored)
+        # Inicializar frontera (Cola) y encola el nodo inicial
+        frontier = QueueFrontier()
+        frontier.add(node)
+
+        while True:
+                # Retorno si la frontera está vacía
+                if frontier.is_empty():
+                    return NoSolution(explored)
+                
+                # Remover un nodo de la frontera
+                node = frontier.remove()
+
+                successors = grid.get_neighbours(node.state)
+                for a in successors:
+                    new_state = successors[a]
+                    if new_state not in explored:
+                        new_node = Node("", new_state, node.cost + grid.get_cost(new_state), node, a)
+               
+                        # Aplicar test-objetivo al nuevo nodo
+                        if new_node.state == grid.end:
+                            return Solution(new_node, explored)
+                            
+                        # Add the node to the explored dictionary
+                        explored[new_state] = True
+
+                        # Agregar a la frontera
+                        frontier.add(new_node)
+
