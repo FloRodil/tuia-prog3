@@ -27,28 +27,29 @@ class DepthFirstSearch:
         frontier.add(node)
 
         # Initialize the explored dictionary to be empty
-        explored = {} 
+        expandidos = {} 
          
         while True:
                 # Retorno si la frontera está vacía
                 if frontier.is_empty():
-                    return NoSolution(explored)
+                    return NoSolution(expandidos)
                 
                 # Remover un nodo de la frontera
                 node = frontier.remove()
 
                 # Se evita expandir un estado ya expandido, antes de continuar
-                if node.state in explored:
-                    explored[node.state] = True
-                    successors = grid.get_neighbours(node.state)
-                    for a in successors:
-                        new_state = successors[a]
-                        if new_state not in explored:
-                            new_node = Node("", new_state, node.cost + grid.get_cost(new_state), node, a)
+                if node.state in expandidos:
+                    pass
+                expandidos[node.state] = True
+                successors = grid.get_neighbours(node.state)
+                for a in successors:
+                    new_state = successors[a]
+                    if new_state not in expandidos:
+                        new_node = Node("", new_state, node.cost + grid.get_cost(new_state), node, a)
                 
-                            # Aplicar test-objetivo al nuevo nodo
-                            if new_node.state == grid.end:
-                                return Solution(new_node)
+                        # Aplicar test-objetivo al nuevo nodo
+                        if new_node.state == grid.end:
+                            return Solution(new_node,expandidos)
 
-                            # Agregar a la frontera
-                            frontier.add(new_node)
+                        # Agregar a la frontera
+                        frontier.add(new_node)
