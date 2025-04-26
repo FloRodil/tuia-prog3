@@ -18,10 +18,57 @@ class AStarSearch:
         # Initialize a node with the initial position
         node = Node("", grid.start, 0)
 
+        # Inicializar frontera (Cola prioridad) 
+        frontier = PriorityQueueFrontier()
+
+        # Encolar el nodo inicial
+        node.manhattan_distance(grid.end)
+        print(node.manhattan_distance(grid.end))
+        f = node.cost + node.estimated_distance
+        print(f)
+        frontier.add(node, f)
+
         # Initialize the explored dictionary to be empty
-        explored = {} 
+        reached = {} 
         
         # Add the node to the explored dictionary
-        explored[node.state] = True
+        reached[node.state] = node.cost
+
+        while frontier.is_empty() == False:
+                # Retorno si la frontera está vacía
+                #if frontier.is_empty():
+                    #return NoSolution(reached)
+                
+                # Remover un nodo de la frontera, el de menor valor de heurística
+                node = frontier.pop()
+                #print(f"Desencolando nodo: {node.state}, h={node.estimated_distance}")
+
+                # Aplicar test-objetivo al nuevo nodo
+                if node.state == grid.end:
+                    return Solution(node, reached)
+                
+                # Se buscan todos los sucesores del nodo actual
+                successors = grid.get_neighbours(node.state)
+                for a in successors:
+                    new_state = successors[a]
+                    #print (new_state)
+                    # Se calcula el costo acumulado para evitar ciclos, no para decidir cuál nodo expandir
+                    new_cost = node.cost + grid.get_cost(new_state) 
+                    #print (new_cost)
+                    
+                    if new_state not in reached or new_cost < reached[new_state]:
+                        new_node = Node("", new_state, new_cost , node, a)
+                        new_node.manhattan_distance(grid.end)
+                        f = new_node.cost + new_node.estimated_distance
+                        #print(f"distancia nuevo nodo:", new_node.estimated_distance)
+                  
+                        # Add the node to the explored dictionary
+                        reached[new_state] = new_cost
+
+                        # Agregar a la frontera
+                        #print(f"Encolando nodo {new_state} con heurística = {new_node.estimated_distance}")
+                        frontier.add(new_node, f)
+
+        # Si no se encontró solución
+        return NoSolution(reached)
         
-        return NoSolution(explored)
