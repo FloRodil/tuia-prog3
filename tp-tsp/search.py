@@ -64,9 +64,8 @@ class HillClimbing(LocalSearch):
             act, succ_val = problem.max_action(actual)
 
             # Retornar si estamos en un maximo local:
-            # el valor objetivo del sucesor es menor o igual al del estado actual
-            if succ_val <= value:
-
+            # el valor objetivo del sucesor es menor o igual al del estado actual (el mejor sucesor es peor opción que actual)
+            if succ_val <= value:             
                 self.tour = actual
                 self.value = value
                 end = time()
@@ -79,10 +78,59 @@ class HillClimbing(LocalSearch):
             self.niters += 1
 
 
+
 class HillClimbingReset(LocalSearch):
     """Algoritmo de ascension de colinas con reinicio aleatorio."""
+    def solve(self, problem: OptProblem):
+        """Resuelve un problema de optimizacion con ascension de colinas.
 
-    # COMPLETAR
+        Argumentos:
+        ==========
+        problem: OptProblem
+            un problema de optimizacion
+        """
+        # Iniciamos el reloj
+        start = time()
+
+        # Definimos variables para guardar la mejor solución
+        best_state = None
+        best_value = float("-inf")
+
+        # Contabilizamos los reinicios
+        reinicios = 0
+        
+        while reinicios < 10: #ver si se puede fijar la probabilidad
+            # Reiniciamos aleatoriamente el problema
+            actual = problem.random_reset()
+            value = problem.obj_val(actual)
+            
+            # Para cada reinicio aplicamos HillClimbing
+            while True:
+
+                # Buscamos la acción que genera el sucesor con mayor valor objetivo
+                act, succ_val = problem.max_action(actual)
+
+                # Si estamos en un máximo local:
+                if succ_val <= value:
+                    break
+
+                # Sino, nos movemos al sucesor
+                actual = problem.result(actual, act) #(devuelve el estado resultante de aplicar la acción act al estado actual)
+                value = succ_val #(actualiza la variable value)
+                self.niters += 1
+
+            # Verificamos si la solución obtenida es mejor que la guardada
+            if value > best_value:
+                best_value = value
+                best_state = actual
+
+            reinicios += 1
+
+        end = time()
+        self.tour = best_state
+        self.value = best_value
+        self.time =  end - start
+    
 
 
 class Tabu(LocalSearch):
