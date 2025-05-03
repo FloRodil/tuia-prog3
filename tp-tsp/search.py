@@ -18,6 +18,7 @@ No viene implementado, se debe completar.
 from __future__ import annotations
 from time import time
 from problem import OptProblem
+from collections import deque
 
 
 class LocalSearch:
@@ -82,7 +83,7 @@ class HillClimbing(LocalSearch):
 class HillClimbingReset(LocalSearch):
     """Algoritmo de ascension de colinas con reinicio aleatorio."""
     def solve(self, problem: OptProblem):
-        """Resuelve un problema de optimizacion con ascension de colinas.
+        """Resuelve un problema de optimizacion con ascension de colinas con reinicio aleatorio.
 
         Argumentos:
         ==========
@@ -100,6 +101,7 @@ class HillClimbingReset(LocalSearch):
         reinicios = 0
         
         while reinicios < 10: #ver si se puede fijar la probabilidad
+
             # Reiniciamos aleatoriamente el problema
             actual = problem.random_reset()
             value = problem.obj_val(actual)
@@ -110,7 +112,7 @@ class HillClimbingReset(LocalSearch):
                 # Buscamos la acción que genera el sucesor con mayor valor objetivo
                 act, succ_val = problem.max_action(actual)
 
-                # Si estamos en un máximo local:
+                # Si estamos en un máximo local interrumpimos la ejecución del bucle while
                 if succ_val <= value:
                     break
 
@@ -135,5 +137,66 @@ class HillClimbingReset(LocalSearch):
 
 class Tabu(LocalSearch):
     """Algoritmo de busqueda tabu."""
+    def solve(self, problem: OptProblem):
+        """Resuelve un problema de optimizacion con ascension de colinas usando lista tabu.
+        Criterio de parada: cantidad de iteraciones
+        La lista tabu almacena acciones
 
-    # COMPLETAR
+        Argumentos:
+        ==========
+        problem: OptProblem
+            un problema de optimizacion
+        """
+        # Inicio del reloj
+        start = time()
+        #print(start)
+
+        # Arrancamos del estado inicial
+        actual = problem.init
+        value = problem.obj_val(problem.init)
+        print(f"Inicialización: estado incial: {actual}, valor inicial: {value}")
+
+        # Definimos variables para guardar la mejor solución
+        best_state = actual
+        best_value = value
+        print(f"Inicialización: mejor estado incial: {best_state}, valor inicial: {best_value}")
+
+        # Lista Tabú, incialmente vacía, guardará acciones con enfoque de capacidad limitada
+        tabu = deque()
+        print(f"Lista tabú al iniciar:", tabu)
+
+        # Inicializamos contador (para criterio de parada por cantidad de iteraciones)
+        iter = 1
+
+        while iter < 50:
+            # Buscamos la acción que genera el sucesor con mayor valor objetivo, si no está en tabú
+            act, succ_val = problem.max_action(actual, tabu, best_value)
+            print(f"iteracion: {iter}, (accion, valor sucesor):{act, succ_val}")
+
+            # Verificamos si el valor de la función objetivo en el sucesor es mejor que el guardado en best
+            if best_value < succ_val:
+                best_state = problem.result(actual, act)
+                best_value = succ_val
+
+            # Actualizamos la lista tabu, teniendo en cuenta la limitación de capacidad
+            print(f"iteracion: {iter}, {len(tabu)}")
+            if len(tabu) > 0.90 * iter:
+                tabu.popleft()
+                tabu.append(act)
+            else:
+                tabu.append(act)
+
+            # Nos movemos al sucesor
+            actual = problem.result(actual, act)
+            value = problem.obj_val(actual)
+            self.niters += 1
+
+            iter += 1
+
+        end = time()
+        print(end)
+        self.tour = best_state
+        self.value = best_value
+        self.time =  end - start
+        #print(f"el tiempo fue", self.time) 
+
