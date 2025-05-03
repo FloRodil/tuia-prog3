@@ -64,7 +64,7 @@ class OptProblem:
         """Determina el valor objetivo de un estado."""
         raise NotImplementedError
 
-    def max_action(self, state: State) -> tuple[Action, float]:
+    def max_action(self, state: State, constraint: list = None) -> tuple[Action, float]:
         """Determina la accion que genera el sucesor con mayor valor objetivo para un estado dado.
 
         La idea es que este metodo este optimizado y sea mas eficiente que generar cada
@@ -161,7 +161,7 @@ class TSP(OptProblem):
             value -= self.G.get_edge_data(u, v)['weight']
         return value
 
-    def max_action(self, state: list[int]) -> tuple[tuple[int, int], float]:
+    def max_action(self, state: list[int], constraint: list = None, best: int = None) -> tuple[tuple[int, int], float]:
         """Determina la accion que genera el sucesor con mayor valor objetivo para un estado dado.
         
         Se encuentra optimizada y por razones de eficiencia no se generan los sucesores y 
@@ -182,20 +182,25 @@ class TSP(OptProblem):
         value = self.obj_val(state)
         max_act = None
         max_val = float("-inf")
+        # Incializamos la lista tabu, lista de restricciones
+        if constraint is None:
+            constraint = []
         for a in self.actions(state):
-            i, j = a
-            v1 = state[i]+1  # origen de i
-            v2 = state[i+1]+1  # destino de i
-            v3 = state[j]+1  # origen de j
-            v4 = state[j+1]+1  # destino de j
-            distl1l2 = self.G.get_edge_data(v1, v2)['weight']
-            distl3l4 = self.G.get_edge_data(v3, v4)['weight']
-            distl1l3 = self.G.get_edge_data(v1, v3)['weight']
-            distl2l4 = self.G.get_edge_data(v2, v4)['weight']
-            succ_value =  value + distl1l2 + distl3l4 - distl1l3 - distl2l4
-            if succ_value > max_val:
-                max_act = a
-                max_val = succ_value
+            # Verificamos si la acción a está en lista tabú y aplicamos criterio de aspiración
+            if a not in constraint or self.obj_val(self.result(state,a)) < best:
+                i, j = a
+                v1 = state[i]+1  # origen de i
+                v2 = state[i+1]+1  # destino de i
+                v3 = state[j]+1  # origen de j
+                v4 = state[j+1]+1  # destino de j
+                distl1l2 = self.G.get_edge_data(v1, v2)['weight']
+                distl3l4 = self.G.get_edge_data(v3, v4)['weight']
+                distl1l3 = self.G.get_edge_data(v1, v3)['weight']
+                distl2l4 = self.G.get_edge_data(v2, v4)['weight']
+                succ_value =  value + distl1l2 + distl3l4 - distl1l3 - distl2l4
+                if succ_value > max_val:
+                    max_act = a
+                    max_val = succ_value
         return max_act, max_val
 
     def random_reset(self) -> list[int]:
