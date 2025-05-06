@@ -30,10 +30,11 @@ class UniformCostSearch:
         # Add the node to the explored dictionary
         alcanzados[node.state] = node.cost
         
-        while True:
+        # Bucle while, se ejecuta mientras la frontera no esté vacía 
+        while frontier:
                 # Retorno si la frontera está vacía
-                if frontier.is_empty():
-                    return NoSolution(alcanzados)
+                # if frontier.is_empty():
+                #     return NoSolution(alcanzados)
                 
                 # Remover un nodo de la frontera
                 node = frontier.pop()
