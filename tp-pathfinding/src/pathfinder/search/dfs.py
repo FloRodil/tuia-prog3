@@ -28,11 +28,12 @@ class DepthFirstSearch:
 
         # Initialize the explored dictionary to be empty
         expandidos = {} 
-         
-        while True:
+
+        # Bucle while, se ejecuta mientras la frontera no esté vacía 
+        while frontier:
                 # Retorno si la frontera está vacía
-                if frontier.is_empty():
-                    return NoSolution(expandidos)
+                # if frontier.is_empty():
+                #     return NoSolution(expandidos)
                 
                 # Remover un nodo de la frontera
                 node = frontier.remove()
