@@ -47,9 +47,9 @@ class UniformCostSearch:
                 for a in successors:
                     new_state = successors[a]
                     new_costo = node.cost + grid.get_cost(new_state)
-                    if new_state not in alcanzados or new_costo < alcanzados(node.state):
+                    if new_state not in alcanzados or new_costo < alcanzados[node.state]:
                         new_node = Node("", new_state, new_costo, node, a)
                         # Add the node to the explored dictionary
                         alcanzados[new_state] = new_costo
                         # Agregar a la frontera
-                        frontier.add(new_state, new_costo)         
+                        frontier.add(new_node, new_costo)         
