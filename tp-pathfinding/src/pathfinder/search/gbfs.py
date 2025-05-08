@@ -34,10 +34,11 @@ class GreedyBestFirstSearch:
         reached[node.state] = node.estimated_distance
         #print(reached)
 
-        while True:
+        # Bucle while, se ejecuta mientras la frontera no esté vacía
+        while frontier:
                 # Retorno si la frontera está vacía
-                if frontier.is_empty():
-                    return NoSolution(reached)
+                # if frontier.is_empty():
+                #     return NoSolution(reached)
                 
                 # Remover un nodo de la frontera, el de menor valor de heurística
                 node = frontier.pop()
