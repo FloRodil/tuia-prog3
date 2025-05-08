@@ -1,5 +1,5 @@
 from ..models.grid import Grid
-from ..models.frontier import PriorityQueueFrontier
+from ..models.frontier import StackFrontier
 from ..models.solution import NoSolution, Solution
 from ..models.node import Node
 
@@ -18,37 +18,10 @@ class UniformCostSearch:
         # Initialize a node with the initial position
         node = Node("", grid.start, 0)
 
-        # Inicializar frontera (Cola prioridad) 
-        frontier = PriorityQueueFrontier()
-
-        # Encolar el nodo inicial
-        frontier.add(node, node.cost)
-
         # Initialize the explored dictionary to be empty
-        alcanzados = {} 
+        explored = {} 
         
         # Add the node to the explored dictionary
-        alcanzados[node.state] = node.cost
+        explored[node.state] = True
         
-        while True:
-                # Retorno si la frontera está vacía
-                if frontier.is_empty():
-                    return NoSolution(alcanzados)
-                
-                # Remover un nodo de la frontera
-                node = frontier.pop()
-
-                # Aplicar test-objetivo al nuevo nodo
-                if node.state == grid.end:
-                    return Solution(node, alcanzados)
-                
-                successors = grid.get_neighbours(node.state)
-                for a in successors:
-                    new_state = successors[a]
-                    new_costo = node.cost + grid.get_cost(new_state)
-                    if new_state not in alcanzados or new_costo < alcanzados(node.state):
-                        new_node = Node("", new_state, new_costo, node, a)
-                        # Add the node to the explored dictionary
-                        alcanzados[new_state] = new_costo
-                        # Agregar a la frontera
-                        frontier.add(new_state, new_costo)         
+        return NoSolution(explored)
